@@ -1,6 +1,7 @@
-Loading diffrent env data from diff config files , env is specified from pipelines or command line
-Configuring eslint rules
-List all the endpoints in a swagger and http://localhost:8000/ should also list all endpoints
+1.Loading diffrent env data from diff config files for diff env , env is specified from pipelines or command line
+2.Configuring eslint rules
+3.List all the endpoints in a swagger and http://localhost:8000/ should also list all endpoints
+4.Redis client is configured to use local redis which fails in the aws lamda
 
 
 const AWS = require("aws-sdk");

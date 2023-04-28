@@ -23,7 +23,7 @@ app.set("views", path.join(__dirname, "views"));
 app.engine("pug", require("ejs").renderFile);
 app.set("view engine", "pug");
 
-redis.createRedis();
+// redis.createRedis();
 
 app.use(cookieParser());
 app.use(
