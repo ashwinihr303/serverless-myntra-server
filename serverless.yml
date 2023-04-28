@@ -1,3 +1,5 @@
+org: ashwinihr303
+app: myntra-server
 service: myntra-server
 frameworkVersion: '3'
 
