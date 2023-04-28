@@ -6,11 +6,11 @@
 
 **Steps tpo deploy the serverless app to AWS API gateway:-**
 
-1. .aws file under users/.aws contains aws creds, As of now aded root user secrete key and value, which needs to be chnaged with iam user secrete key by creating a new role with all required permissions like cloudformation, cloudwatch etc
+1. Create .aws file under users/.aws, which contains aws creds, As of now aded root user secrete key and value, which needs to be chnaged with iam user secrete key by creating a new role with all required permissions like cloudformation, cloudwatch etc
 
 2.npm i -g serverless && serverless and select the template of the app and other details // enter aws creds after creating security key in aws console for first time when .aws file does not exist
 
-3.sls deploy //command to deploy serverless code , which will be deployed the code to API gateway
+3.sls deploy //command to deploy serverless code , which will be deploy the code to API gateway
 
 4.serverless --console // sets the serverless console
 
