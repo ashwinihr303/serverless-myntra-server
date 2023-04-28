@@ -6,6 +6,7 @@
     "start": "nodemon handler.js"
   },
   "dependencies": {
+    "async-redis": "^2.0.0",
     "aws-sdk": "^2.1173.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -25,7 +26,6 @@
     "serverless-http": "^2.7.0"
   },
   "devDependencies": {
-    "async-redis": "^2.0.0",
     "nodemon": "^2.0.22",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-offline": "^12.0.4"
