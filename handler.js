@@ -41,9 +41,9 @@ app.use(
   })
 );
 
-app.use(reqLogger);
+// app.use(reqLogger);
 app.use("/", indexRouter);
-app.use(errLogger);
+// app.use(errLogger);
 
 // app.set("view engine", "jade");
 
