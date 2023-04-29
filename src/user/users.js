@@ -11,6 +11,8 @@ const {
 } = require("../utils/tokens");
 const { fakeDB } = require("../utils/fakeDB");
 const { isAuth } = require("../utils/isAuth");
+const { getSecrets } = require("../utils/loadSecrets");
+
 // 1. Register a user
 router.post("/register", async (req, res) => {
   const { email, password } = req.body;
@@ -118,7 +120,8 @@ router.post("/refresh_token", (req, res) => {
 });
 
 // test
-router.get("/test", (req, res) => {
-  return res.send({ msg: "test" });
+router.get("/test", async (req, res) => {
+  const secret = await getSecrets("secrets_access_key");
+  return res.send({ msg: `Secrete value ${secret}` });
 });
 module.exports = router;
