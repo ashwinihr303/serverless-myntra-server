@@ -14,6 +14,13 @@ const { isAuth } = require("../utils/isAuth");
 const { getSecrets } = require("../utils/loadSecrets");
 const AWS = require("aws-sdk");
 const USERS_TABLE = process.env.users_table;
+
+AWS.config.update({
+  region: process.env.region,
+  accessKeyId: 'AKIARTLU35K4LTZ6AHPW',
+  secretAccessKey: '+iy0b+IG5NV1Ov0uawsF2TeNih621wSOxI523+GWB',
+}); // The config should before dynamodb instance creation
+
 const dynamoDbClient = new AWS.DynamoDB.DocumentClient();
 
 // 1. Register a user
