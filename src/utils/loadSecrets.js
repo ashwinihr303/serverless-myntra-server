@@ -1,3 +1,9 @@
+const AWS = require("aws-sdk");
+AWS.config.update({
+  region: process.env.region,
+  accessKeyId: process.envaccessKeyId,
+  secretAccessKey: process.envsecretAccessKey,
+}); // This config should be at the top always
 const {
   SecretsManagerClient,
   GetSecretValueCommand,
