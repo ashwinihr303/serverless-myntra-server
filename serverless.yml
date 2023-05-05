@@ -4,26 +4,15 @@ service: myntra-server
 frameworkVersion: '3'
 
 custom:
-  tableName: 'users-table-${sls:stage}'
+  tableName: 'myntra_users'
 
 provider:
   name: aws
   runtime: nodejs18.x
   iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource:
-            - Fn::GetAtt: [ UsersTable, Arn ]
-  environment:
-    USERS_TABLE: ${self:custom.tableName}
+    deploymentRole:
+	  Fn::Sub: 'arn:aws:iam::110303636152:role/MyApp-CloudFormationExecutionRole'
+    
 
 functions:
   api:
@@ -44,6 +33,306 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.tableName}
+
+Policies:
+  - PolicyName: DelegateToCloudFormationRole
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Action:
+            - iam:PassRole
+          Resource:
+            - !GetAtt CloudFormationExecutionRole.Arn
+          Effect: Allow
+  - PolicyName: ServerlessFrameworkCli
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Sid: ValidateCloudFormation
+          Effect: Allow
+          Action:
+            - cloudformation:ValidateTemplate
+          Resource: '*'
+        - Sid: ExecuteCloudFormation
+          Effect: Allow
+          Action:
+            - cloudformation:CreateChangeSet
+            - cloudformation:CreateStack
+            - cloudformation:DeleteChangeSet
+            - cloudformation:DeleteStack
+            - cloudformation:DescribeChangeSet
+            - cloudformation:DescribeStackEvents
+            - cloudformation:DescribeStackResource
+            - cloudformation:DescribeStackResources
+            - cloudformation:DescribeStacks
+            - cloudformation:ExecuteChangeSet
+            - cloudformation:ListStackResources
+            - cloudformation:SetStackPolicy
+            - cloudformation:UpdateStack
+            - cloudformation:UpdateTerminationProtection
+            - cloudformation:GetTemplate
+          Resource:
+            - !Sub 'arn:aws:cloudformation:us-east-1:110303636152:stack/myntra-server-*/*'
+        - Sid: ReadLambda
+          Effect: Allow
+          Action:
+            - lambda:Get*
+            - lambda:List*
+          Resource:
+            - '*'
+        - Sid: ManageSlsDeploymentBucket
+          Effect: Allow
+          Action:
+            - s3:CreateBucket
+            - s3:DeleteBucket
+            - s3:ListBucket
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            - s3:GetBucketPolicy
+            - s3:PutBucketPolicy
+            - s3:DeleteBucketPolicy
+            - s3:PutBucketAcl
+            - s3:GetEncryptionConfiguration
+            - s3:PutEncryptionConfiguration
+          Resource:
+            - !Sub 'arn:aws:s3:::myntra-server-*'
+        - Sid: ListS3
+          Effect: Allow
+          Action:
+            - s3:List*
+          Resource: '*'
+  - PolicyName: DeployLambdaFunctions
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - lambda:Get*
+            - lambda:List*
+            - lambda:CreateFunction
+            - lambda:DeleteFunction
+            - lambda:CreateFunction
+            - lambda:DeleteFunction
+            - lambda:UpdateFunctionConfiguration
+            - lambda:UpdateFunctionCode
+            - lambda:PublishVersion
+            - lambda:CreateAlias
+            - lambda:DeleteAlias
+            - lambda:UpdateAlias
+            - lambda:AddPermission
+            - lambda:RemovePermission
+            - lambda:InvokeFunction
+          Resource:
+            - !Sub 'arn:aws:lambda:us-east-1:110303636152:function:myntra-server-*'
+  - PolicyName: DeployLogGroups
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:Get*
+            - logs:Describe*
+            - logs:List*
+            - logs:DeleteLogGroup
+            - logs:PutResourcePolicy
+            - logs:DeleteResourcePolicy
+            - logs:PutRetentionPolicy
+            - logs:DeleteRetentionPolicy
+            - logs:TagLogGroup
+            - logs:UntagLogGroup
+          Resource:
+            - !Sub 'arn:aws:logs:us-east-1:110303636152:log-group:/aws/lambda/myntra-server-*'
+            - !Sub 'arn:aws:logs:us-east-1:110303636152:log-group:/aws/http-api/myntra-server-*'
+        - Effect: Allow
+          Action:
+            - logs:Describe*
+          Resource:
+            - !Sub 'arn:aws:logs:us-east-1:110303636152:log-group:*'
+        - Effect: Allow
+          Action:
+            - logs:CreateLogDelivery
+            - logs:DeleteLogDelivery
+            - logs:DescribeResourcePolicies
+            - logs:DescribeLogGroups
+          Resource:
+            - '*'
+  - PolicyName: DeployAppBuckets
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Sid: AllBucketPermissions
+          Effect: Allow
+          Action:
+            - s3:ListAllMyBuckets
+            - s3:ListBucket
+          Resource: '*'
+        - Sid: WriteAppBuckets
+          Effect: Allow
+          Action:
+            - s3:Get*
+            - s3:List*
+            - s3:CreateBucket
+            - s3:DeleteBucket
+            - s3:PutObject
+            - s3:DeleteObject
+            - s3:PutBucketPolicy
+            - s3:DeleteBucketPolicy
+            - s3:PutEncryptionConfiguration
+          Resource:
+            - !Sub 'arn:aws:s3:::myntra-server-*'
+  - PolicyName: DeployCloudFront
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - cloudfront:Get*
+            - cloudfront:List*
+            - cloudfront:CreateDistribution
+            - cloudfront:UpdateDistribution
+            - cloudfront:DeleteDistribution
+            - cloudfront:TagResource
+            - cloudfront:UntagResource
+          Resource:
+            - !Sub 'arn:aws:cloudfront::110303636152:*/*'
+        - Sid: DeployCloudFrontOriginAccessIdentity
+          Effect: Allow
+          Action:
+            - cloudfront:CreateCloudFrontOriginAccessIdentity
+            - cloudfront:UpdateCloudFrontOriginAccessIdentity
+            - cloudfront:GetCloudFrontOriginAccessIdentity
+            - cloudfront:GetCloudFrontOriginAccessIdentityConfig
+            - cloudfront:DeleteCloudFrontOriginAccessIdentity
+            - cloudfront:ListCloudFrontOriginAccessIdentities
+          Resource: '*'
+  - PolicyName: DeployLambdaExecutionRoles
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - iam:Get*
+            - iam:List*
+            - iam:PassRole
+            - iam:CreateRole
+            - iam:DeleteRole
+            - iam:AttachRolePolicy
+            - iam:DeleteRolePolicy
+            - iam:PutRolePolicy
+            - iam:TagRole
+            - iam:UntagRole
+          Resource:
+            - !Sub 'arn:aws:iam::110303636152:role/myntra-server-*'
+  - PolicyName: DeployAPIGateway
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - apigateway:GET
+            - apigateway:POST
+            - apigateway:PUT
+            - apigateway:PATCH
+            - apigateway:DELETE
+          Resource:
+            - !Sub 'arn:aws:apigateway:us-east-1::/apis'
+            - !Sub 'arn:aws:apigateway:us-east-1::/apis/*'
+  - PolicyName: DeployEventBridge
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - events:Describe*
+            - events:Get*
+            - events:List*
+            - events:CreateEventBus
+            - events:DeleteEventBus
+            - events:PutRule
+            - events:DeleteRule
+            - events:PutTargets
+            - events:RemoveTargets
+            - events:TagResource
+            - events:UntagResource
+          Resource:
+            - !Sub 'arn:aws:events:us-east-1:110303636152:event-bus/myntra-server-*'
+            - !Sub 'arn:aws:events:us-east-1:110303636152:rule/myntra-server-*'
+  - PolicyName: DeploySNSTopics
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - sns:Get*
+            - sns:Describe*
+            - sns:CreateTopic
+            - sns:DeleteTopic
+            - sns:SetTopicAttributes
+            - sns:Subscribe
+            - sns:Unsubscribe
+            - sns:TagResource
+          Resource:
+            - !Sub 'arn:aws:sns:us-east-1:110303636152:myntra-server-*'
+  - PolicyName: DeployDynamoDB
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - dynamodb:CreateTable
+            - dynamodb:CreateTableReplica
+            - dynamodb:CreateGlobalTable
+            - dynamodb:DeleteTable
+            - dynamodb:DeleteGlobalTable
+            - dynamodb:DeleteTableReplica
+            - dynamodb:Describe*
+            - dynamodb:List*
+            - dynamodb:Get*
+            - dynamodb:TagResource
+            - dynamodb:UntagResource
+            - dynamodb:UpdateContinuousBackups
+            - dynamodb:UpdateGlobalTable
+            - dynamodb:UpdateGlobalTableSettings
+            - dynamodb:UpdateTable
+            - dynamodb:UpdateTableReplicaAutoScaling
+            - dynamodb:UpdateTimeToLive
+          Resource:
+            - !Sub 'arn:aws:dynamodb:us-east-1:110303636152:table/myntra-server-*'
+            - !Sub 'arn:aws:dynamodb::110303636152:global-table/myntra-server-*'
+  - PolicyName: DeploySQS
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - sqs:CreateQueue
+            - sqs:DeleteQueue
+            - sqs:SetQueueAttributes
+            - sqs:AddPermission
+            - sqs:RemovePermission
+            - sqs:TagQueue
+            - sqs:UntagQueue
+            - sqs:Get*
+            - sqs:List*
+          Resource:
+            - !Sub 'arn:aws:sqs:us-east-1:110303636152:myntra-server-*'
+  - PolicyName: DeploySSMParameterStore
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter*
+            - ssm:DescribeParameters
+            - ssm:DeleteParameter*
+            - ssm:PutParameter
+          Resource:
+            - !Sub 'arn:aws:ssm:us-east-1:110303636152:parameter/myntra-server'
+            - !Sub 'arn:aws:ssm:us-east-1:110303636152:parameter/myntra-server/*'
 plugins:
   - serverless-offline
   - serverless-dynamodb-local
+  
+  
