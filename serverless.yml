@@ -342,6 +342,19 @@ Policies:
           Resource:
             - !Sub 'arn:aws:ssm:us-east-1:110303636152:parameter/myntra-server'
             - !Sub 'arn:aws:ssm:us-east-1:110303636152:parameter/myntra-server/*'
+  - PolicyName: DeploySecretsManager
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - secretsmanager:DescribeSecret
+            - secretsmanager:List*
+            - secretsmanager:GetSecretValue
+          Resource:
+            - !Sub 'arn:aws:secretsmanager:us-east-1:110303636152:secret:Myntra_server_secrets-vdPs8R'
+
+
 plugins:
   - serverless-offline
   - serverless-dynamodb-local
