@@ -10,6 +10,18 @@ provider:
   name: aws
   runtime: nodejs18.x
   iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UsersTable, arn:aws:dynamodb:us-east-1:110303636152:table/myntra-users ]
     deploymentRole:
 	    Fn::Sub: 'arn:aws:iam::110303636152:role/MyApp-CloudFormationExecutionRole'
     AssumeRolePolicyDocument:
