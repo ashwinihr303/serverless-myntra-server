@@ -11,7 +11,14 @@ provider:
   runtime: nodejs18.x
   iam:
     deploymentRole:
-	  Fn::Sub: 'arn:aws:iam::110303636152:role/MyApp-CloudFormationExecutionRole'
+	    Fn::Sub: 'arn:aws:iam::110303636152:role/MyApp-CloudFormationExecutionRole'
+    AssumeRolePolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+        Principal:
+          Service: cloudformation.amazonaws.com
+        Action: sts:AssumeRole
     
 
 functions:
@@ -33,6 +40,10 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.tableName}
+
+# `CloudFormationExecutionRole` policies
+ManagedPolicyArns:
+  - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
 
 Policies:
   - PolicyName: DelegateToCloudFormationRole
