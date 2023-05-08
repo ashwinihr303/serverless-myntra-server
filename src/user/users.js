@@ -20,8 +20,10 @@ AWS.config.update({
   accessKeyId: process.env.accessKeyId,
   secretAccessKey: process.env.secretAccessKey,
 }); // The config should before dynamodb instance creation
-
-const dynamoDbClient = new AWS.DynamoDB.DocumentClient();
+const { DynamoDBClient, 
+  GetItemCommand , PutItemCommand
+} = require("@aws-sdk/client-dynamodb");
+const dbclient = new DynamoDBClient({ region: process.env.region});
 
 // 1. Register a user
 router.post("/register", async (req, res) => {
@@ -139,15 +141,14 @@ router.get("/users/:userId", async function (req, res) {
   const params = {
     TableName: USERS_TABLE,
     Key: {
-      userId: req.params.userId,
+      userId: {S:req.params.userId},
     },
   };
 
   try {
-    const { Item } = await dynamoDbClient.get(params).promise();
+    const { Item } = await dbclient.send(new GetItemCommand(params));
     if (Item) {
-      const { userId, name } = Item;
-      res.json({ userId, name });
+      res.send(Item );
     } else {
       res
         .status(404)
@@ -170,14 +171,14 @@ router.post("/users", async function (req, res) {
   const params = {
     TableName: USERS_TABLE,
     Item: {
-      userId: userId,
-      name: name,
+      userId: {S:userId},
+      name: {S:name},
     },
   };
 
   try {
-    await dynamoDbClient.put(params).promise();
-    res.json({ userId, name });
+    const  Item  = await dbclient.send(new PutItemCommand(params));
+    res.send(Item)
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Could not create user" });

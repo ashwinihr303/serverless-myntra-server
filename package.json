@@ -6,6 +6,7 @@
     "start": "nodemon handler.js"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.328.0",
     "@aws-sdk/client-secrets-manager": "^3.321.1",
     "async-redis": "^2.0.0",
     "aws-sdk": "^2.1173.0",
