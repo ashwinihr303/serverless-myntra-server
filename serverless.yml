@@ -4,34 +4,11 @@ service: myntra-server
 frameworkVersion: '3'
 
 custom:
-  tableName: 'myntra_users'
+  tableName: 'myntra-server'
 
 provider:
   name: aws
-  runtime: nodejs18.x
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource:
-            - Fn::GetAtt: [ UsersTable, arn:aws:dynamodb:us-east-1:110303636152:table/myntra-users ]
-    deploymentRole:
-	    Fn::Sub: 'arn:aws:iam::110303636152:role/MyApp-CloudFormationExecutionRole'
-    AssumeRolePolicyDocument:
-      Version: 2012-10-17
-      Statement:
-        - Effect: Allow
-        Principal:
-          Service: cloudformation.amazonaws.com
-        Action: sts:AssumeRole
-    
+  runtime: nodejs18.x  
 
 functions:
   api:
@@ -52,10 +29,6 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.tableName}
-
-# `CloudFormationExecutionRole` policies
-ManagedPolicyArns:
-  - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
 
 Policies:
   - PolicyName: DelegateToCloudFormationRole
@@ -321,9 +294,15 @@ Policies:
             - dynamodb:UpdateTable
             - dynamodb:UpdateTableReplicaAutoScaling
             - dynamodb:UpdateTimeToLive
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
           Resource:
-            - !Sub 'arn:aws:dynamodb:us-east-1:110303636152:table/myntra-server-*'
-            - !Sub 'arn:aws:dynamodb::110303636152:global-table/myntra-server-*'
+            - !Sub 'arn:aws:dynamodb:us-east-1:110303636152:table/myntra-server'
+            - !Sub 'arn:aws:dynamodb::110303636152:global-table/myntra-server'
   - PolicyName: DeploySQS
     PolicyDocument:
       Version: '2012-10-17'
