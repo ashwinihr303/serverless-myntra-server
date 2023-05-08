@@ -21,7 +21,7 @@ AWS.config.update({
   secretAccessKey: process.env.secretAccessKey,
 }); // The config should before dynamodb instance creation
 const { DynamoDBClient, 
-  GetItemCommand , PutItemCommand
+  GetItemCommand , PutItemCommand, UpdateItemCommand
 } = require("@aws-sdk/client-dynamodb");
 const dbclient = new DynamoDBClient({ region: process.env.region});
 
@@ -178,6 +178,28 @@ router.post("/users", async function (req, res) {
 
   try {
     const  Item  = await dbclient.send(new PutItemCommand(params));
+    res.send(Item)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not create user" });
+  }
+});
+router.put("/users", async function (req, res) {
+  const { userId, name } = req.body;
+  if  (typeof name !== "string") {
+    res.status(400).json({ error: '"name" must be a string' });
+  }
+
+  const params = {
+    TableName: USERS_TABLE,
+    Item: {
+      userId: {S:userId},
+      name: {S:name},
+    },
+  };
+
+  try {
+    const  Item  = await dbclient.send(new UpdateItemCommand(params));
     res.send(Item)
   } catch (error) {
     console.log(error);
