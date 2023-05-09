@@ -131,8 +131,8 @@ router.post("/refresh_token", (req, res) => {
   return res.send({ accesstoken });
 });
 
-// test
-router.get("/test", async (req, res) => {
+// load secrets from secrete manager
+router.get("/load_secrets", async (req, res) => {
   const secret = await getSecrets("secrets_access_key");
   return res.send({ msg: `Secrete value ${secret}` });
 });
@@ -207,4 +207,9 @@ router.put("/users", async function (req, res) {
   }
 });
 
+// test
+router.post("/test", async (req, res) => {
+  console.log("ttttttttttttt")
+  return res.send({ msg: `uploaded sucessfully` });
+});
 module.exports = router;
