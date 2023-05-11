@@ -208,8 +208,7 @@ router.put("/users", async function (req, res) {
 });
 
 // test
-router.post("/test", async (req, res) => {
-  console.log("ttttttttttttt")
+router.post("/upload-file", async (req, res) => {
   return res.send({ msg: `uploaded sucessfully` });
 });
 module.exports = router;
