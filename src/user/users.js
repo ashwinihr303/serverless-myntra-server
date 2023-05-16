@@ -9,6 +9,7 @@ const {
   sendRefreshToken,
   sendAccessToken,
 } = require("../utils/tokens");
+const s3Upload = require('../utils/s3_upload');
 const { fakeDB } = require("../utils/fakeDB");
 const { isAuth } = require("../utils/isAuth");
 const { getSecrets } = require("../utils/loadSecrets");
@@ -20,6 +21,7 @@ AWS.config.update({
   accessKeyId: process.env.accessKeyId,
   secretAccessKey: process.env.secretAccessKey,
 }); // The config should before dynamodb instance creation
+
 const { DynamoDBClient, 
   GetItemCommand , PutItemCommand, UpdateItemCommand
 } = require("@aws-sdk/client-dynamodb");
@@ -208,8 +210,10 @@ router.put("/users", async function (req, res) {
 });
 
 // test
-router.post("/test", async (req, res) => {
-  console.log("ttttttttttttt")
-  return res.send({ msg: `uploaded sucessfully` });
+router.post("/upload-file-s3", async (req, res) => {
+  console.log(req.file);
+  const response = await s3Upload.handle(req.file);
+  res.send(response);
 });
+
 module.exports = router;
