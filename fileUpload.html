@@ -7,6 +7,16 @@
     <!-- HTML5 Input Form Elements -->
     <input id="fileupload" type="file" name="fileupload" />
     <button id="upload-button" onclick="uploadFile()">Upload</button>
+  </br>
+</br>
+    <h2>File Upload With <code>"Node.js"</code></h2>
+    <form action="http://localhost:8000/user/upload-file-s3" enctype="multipart/form-data" method="post">
+      <div>Select a file: 
+        <input name="file" type="file" />
+      </div>
+      <input type="submit" value="Upload" />
+    </form>
+
 
     <!-- Ajax JavaScript File Upload Logic -->
     <script>
