@@ -12,6 +12,7 @@ const {
 const { fakeDB } = require("../utils/fakeDB");
 const { isAuth } = require("../utils/isAuth");
 const { getSecrets } = require("../utils/loadSecrets");
+const s3 = require("../utils/fileparser");
 const AWS = require("aws-sdk");
 const USERS_TABLE = process.env.users_table;
 
@@ -20,10 +21,14 @@ AWS.config.update({
   accessKeyId: process.env.accessKeyId,
   secretAccessKey: process.env.secretAccessKey,
 }); // The config should before dynamodb instance creation
-const { DynamoDBClient, 
-  GetItemCommand , PutItemCommand, UpdateItemCommand
+
+const {
+  DynamoDBClient,
+  GetItemCommand,
+  PutItemCommand,
+  UpdateItemCommand,
 } = require("@aws-sdk/client-dynamodb");
-const dbclient = new DynamoDBClient({ region: process.env.region});
+const dbclient = new DynamoDBClient({ region: process.env.region });
 
 // 1. Register a user
 router.post("/register", async (req, res) => {
@@ -141,14 +146,14 @@ router.get("/users/:userId", async function (req, res) {
   const params = {
     TableName: USERS_TABLE,
     Key: {
-      userId: {S:req.params.userId},
+      userId: { S: req.params.userId },
     },
   };
 
   try {
     const { Item } = await dbclient.send(new GetItemCommand(params));
     if (Item) {
-      res.send(Item );
+      res.send(Item);
     } else {
       res
         .status(404)
@@ -171,14 +176,14 @@ router.post("/users", async function (req, res) {
   const params = {
     TableName: USERS_TABLE,
     Item: {
-      userId: {S:userId},
-      name: {S:name},
+      userId: { S: userId },
+      name: { S: name },
     },
   };
 
   try {
-    const  Item  = await dbclient.send(new PutItemCommand(params));
-    res.send(Item)
+    const Item = await dbclient.send(new PutItemCommand(params));
+    res.send(Item);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Could not create user" });
@@ -186,21 +191,21 @@ router.post("/users", async function (req, res) {
 });
 router.put("/users", async function (req, res) {
   const { userId, name } = req.body;
-  if  (typeof name !== "string") {
+  if (typeof name !== "string") {
     res.status(400).json({ error: '"name" must be a string' });
   }
 
   const params = {
     TableName: USERS_TABLE,
     Item: {
-      userId: {S:userId},
-      name: {S:name},
+      userId: { S: userId },
+      name: { S: name },
     },
   };
 
   try {
-    const  Item  = await dbclient.send(new UpdateItemCommand(params));
-    res.send(Item)
+    const Item = await dbclient.send(new UpdateItemCommand(params));
+    res.send(Item);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Could not create user" });
@@ -208,7 +213,20 @@ router.put("/users", async function (req, res) {
 });
 
 // test
-router.post("/upload-file", async (req, res) => {
-  return res.send({ msg: `uploaded sucessfully` });
+router.post("/upload-file-s3", async (req, res) => {
+  await s3
+    .parsefile(req)
+    .then((data) => {
+      res.status(200).json({
+        message: "Success",
+        data,
+      });
+    })
+    .catch((error) => {
+      res.status(400).json({
+        message: "An error occurred.",
+        error,
+      });
+    });
 });
 module.exports = router;
