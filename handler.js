@@ -62,7 +62,7 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(process.env.PORT, function () {
-  console.log(`Server listening on port test ${process.env.PORT}`);
+  console.log(`Server listening on port  ${process.env.PORT}`);
 });
 
 module.exports.handler = serverless(app);
