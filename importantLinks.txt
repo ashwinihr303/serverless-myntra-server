@@ -1,0 +1,1 @@
+https://stackoverflow.com/questions/71080354/getting-the-bucket-does-not-allow-acls-error

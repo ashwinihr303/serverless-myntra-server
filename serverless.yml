@@ -34,7 +34,6 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.bucketName}
-        AccessControl: PublicRead
 
 Policies:
   - PolicyName: DelegateToCloudFormationRole
