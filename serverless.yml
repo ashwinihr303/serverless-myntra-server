@@ -35,37 +35,6 @@ resources:
       Properties:
         BucketName: ${self:custom.bucketName}
         AccessControl: PublicRead
-    UploadRole:
-      Type: AWS::IAM::Role
-      Properties:
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - lambda.amazonaws.com
-              Action: sts:AssumeRole
-        Policies:
-          - PolicyName: upload-policy
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:PutObjectAcl
-                  Resource:
-                    !Sub
-                      - "arn:aws:s3:::myntra-server/*"
-                - Effect: Allow
-                  Action:
-                    - logs:CreateLogGroup
-                    - logs:CreateLogStream
-                    - logs:PutLogEvents
-                  Resource:
-                    Fn::Sub:
-                      - arn:aws:logs:us-east-1:110303636152:log-group:/aws/lambda/*:*:*
 
 Policies:
   - PolicyName: DelegateToCloudFormationRole
@@ -120,6 +89,7 @@ Policies:
             - s3:DeleteBucket
             - s3:ListBucket
             - s3:PutObject
+            - s3:PutObjectAcl
             - s3:GetObject
             - s3:DeleteObject
             - s3:GetBucketPolicy
@@ -165,6 +135,8 @@ Policies:
         - Effect: Allow
           Action:
             - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
             - logs:Get*
             - logs:Describe*
             - logs:List*
@@ -209,6 +181,7 @@ Policies:
             - s3:CreateBucket
             - s3:DeleteBucket
             - s3:PutObject
+            - s3:PutObjectAcl
             - s3:DeleteObject
             - s3:PutBucketPolicy
             - s3:DeleteBucketPolicy
