@@ -57,8 +57,7 @@ resources:
                     - s3:PutObjectAcl
                   Resource:
                     !Sub
-                      - "arn:aws:s3:::${BucketName}/*"
-                      - {BucketName: !Ref S3Bucket}
+                      - "arn:aws:s3:::myntra-server/*"
                 - Effect: Allow
                   Action:
                     - logs:CreateLogGroup
@@ -66,8 +65,7 @@ resources:
                     - logs:PutLogEvents
                   Resource:
                     Fn::Sub:
-                      - arn:aws:logs:${Region}:${AccountId}:log-group:/aws/lambda/*:*:*
-                      - { Region: !Ref AWS::Region, AccountId: !Ref AWS::AccountId }
+                      - arn:aws:logs:us-east-1:110303636152:log-group:/aws/lambda/*:*:*
 
 Policies:
   - PolicyName: DelegateToCloudFormationRole
@@ -131,7 +129,7 @@ Policies:
             - s3:GetEncryptionConfiguration
             - s3:PutEncryptionConfiguration
           Resource:
-            - !Sub 'arn:aws:s3:::myntra-server-*'
+            - !Sub 'arn:aws:s3:::myntra-server'
         - Sid: ListS3
           Effect: Allow
           Action:
@@ -216,7 +214,7 @@ Policies:
             - s3:DeleteBucketPolicy
             - s3:PutEncryptionConfiguration
           Resource:
-            - !Sub 'arn:aws:s3:::myntra-server-*'
+            - !Sub 'arn:aws:s3:::myntra-server'
   - PolicyName: DeployCloudFront
     PolicyDocument:
       Version: '2012-10-17'
