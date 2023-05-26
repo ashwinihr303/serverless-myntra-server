@@ -10,7 +10,7 @@
   </br>
 </br>
     <h2>File Upload With <code>"Node.js"</code></h2>
-    <form action="http://localhost:8000/user/upload-file-s3" enctype="multipart/form-data" method="post">
+    <form action="https://g3h68slv7e.execute-api.us-east-1.amazonaws.com/user/upload-file-s3" enctype="multipart/form-data" method="post">
       <div>Select a file: 
         <input name="file" type="file" />
       </div>
@@ -23,7 +23,7 @@
       async function uploadFile() {
         let formData = new FormData();
         formData.append("file", fileupload.files[0]);
-        const response = await fetch("http://localhost:8000/user/upload-file-s3", {
+        const response = await fetch("https://g3h68slv7e.execute-api.us-east-1.amazonaws.com/user/upload-file-s3", {
           method: "POST",
           body: formData,
         })
